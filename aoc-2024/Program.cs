@@ -4,5 +4,5 @@ Console.WriteLine("Running all tests");
 Solver.TestAll();
 
 Console.WriteLine("Running all solutions");
-Solver.RunAll();
+Solver.SolveAll();
 

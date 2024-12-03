@@ -6,40 +6,29 @@ public partial class Day03 : BaseDay
 {
     public override long Part1() => MulRegex()
         .Matches(Input)
-        .Select(v =>
-            NumRegex()
-                .Matches(v.Value)
-                .Take(2)
-                .Select(m => int.Parse(m.Value))
-                .Aggregate((a, b) => a * b))
-        .Sum();
-
-
-    public override long Part2() => Part2Regex()
-            .Matches(Input)
-            .Aggregate((active: true, sum: 0L), (state, match) =>
-            {
-                (bool active, long sum) = state;
-                return match.Value switch
-                {
-                    "do()" => (true, sum),
-                    "don't()" => (false, sum),
-                    _ when active => (active, sum + NumRegex()
-                        .Matches(match.Value)
-                        .Take(2)
-                        .Select(m => int.Parse(m.Value))
-                        .Aggregate((a, b) => a * b)),
-                    _ => state
-                };
-            }).sum;
+        .Sum(match => MulProduct(match.Value));
     
+    public override long Part2() => Part2Regex()
+        .Matches(Input)
+        .Aggregate((active: true, sum: 0L), (state, match) => match.Value switch
+        {
+            "do()" => (true, state.sum),
+            "don't()" => (false, state.sum),
+            _ => (state.active, state.active ? state.sum + MulProduct(match.Value) : state.sum)
+        }).sum;
 
+    private static int MulProduct(string match)
+    {
+        ReadOnlySpan<char> span = match.AsSpan(4, match.Length - 5);
+        int commaIndex = span.IndexOf(',');
+        int num1 = int.Parse(span[..commaIndex]);
+        int num2 = int.Parse(span[(commaIndex + 1)..]);
+        return num1 * num2;
+    }
 
     [GeneratedRegex(@"mul\(\d+,\d+\)")]
     private static partial Regex MulRegex();
 
-    [GeneratedRegex(@"\d+")]
-    private static partial Regex NumRegex();
 
     [GeneratedRegex(@"do\(\)|don't\(\)|mul\(\d{1,3},\d{1,3}\)")]
     private static partial Regex Part2Regex();

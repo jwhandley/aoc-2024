@@ -27,9 +27,38 @@ public static class Solver
         {
             var instance = (BaseDay)Activator.CreateInstance(type)!;
             watch.Restart();
-            Console.WriteLine($"{instance.GetType().Name} Part 1: {instance.Part1()} ({watch.ElapsedMilliseconds}ms)");
+            Console.WriteLine($"{instance.GetType().Name} Part 1: {instance.Part1()} ({watch.Elapsed.Format()})");
             watch.Restart();
-            Console.WriteLine($"{instance.GetType().Name} Part 2: {instance.Part2()} ({watch.ElapsedMilliseconds}ms)");
+            Console.WriteLine($"{instance.GetType().Name} Part 2: {instance.Part2()} ({watch.Elapsed.Format()})");
+        }
+    }
+    
+    private static string Format(this TimeSpan timeSpan)
+    {
+        long totalTicks = timeSpan.Ticks;
+
+        switch (totalTicks)
+        {
+            case >= TimeSpan.TicksPerSecond:
+            {
+                double seconds = totalTicks / (double)TimeSpan.TicksPerSecond;
+                return $"{seconds:F2} s";
+            }
+            case >= TimeSpan.TicksPerMillisecond:
+            {
+                double milliseconds = totalTicks / (double)TimeSpan.TicksPerMillisecond;
+                return $"{milliseconds:F2} ms";
+            }
+            case >= 10:
+            {
+                double microseconds = totalTicks / 10.0;
+                return $"{microseconds:F2} µs";
+            }
+            default:
+            {
+                double nanoseconds = totalTicks * 100;
+                return $"{nanoseconds:F2} ns";
+            }
         }
     }
 }

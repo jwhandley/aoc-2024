@@ -40,13 +40,7 @@ public class Day01 : BaseDay
             list.Add(left);
             counts[right] = counts.GetValueOrDefault(right) + 1;
         }
-        
-        long result = 0;
-        foreach (int item in list)
-        {
-            result += item * counts.GetValueOrDefault(item);
-        }
-        
-        return result;
+
+        return list.Aggregate<int, long>(0, (current, item) => current + item * counts.GetValueOrDefault(item));
     }
 }

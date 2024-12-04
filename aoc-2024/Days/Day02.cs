@@ -23,8 +23,6 @@ public class Day02 : BaseDay
 
     private static bool IsSafeWithRemoval(int[] report)
     {
-        if (IsSafe(report)) return true;
-
         for (int ignore = 0; ignore < report.Length; ignore++)
         {
             int[] modifiedReport = new int[report.Length-1];

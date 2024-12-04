@@ -27,9 +27,9 @@ public static class Solver
         {
             var instance = (BaseDay)Activator.CreateInstance(type)!;
             watch.Restart();
-            Console.WriteLine($"{instance.GetType().Name} Part 1: {instance.Part1()} ({watch.Elapsed.Format()})");
+            Console.WriteLine($"Day {instance.GetNumber()} Part 1: {instance.Part1()} ({watch.Elapsed.Format()})");
             watch.Restart();
-            Console.WriteLine($"{instance.GetType().Name} Part 2: {instance.Part2()} ({watch.Elapsed.Format()})");
+            Console.WriteLine($"Day {instance.GetNumber()} Part 2: {instance.Part2()} ({watch.Elapsed.Format()})");
         }
     }
     

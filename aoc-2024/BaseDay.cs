@@ -8,7 +8,8 @@ public abstract class BaseDay
     public static bool UseTestInput { get; set; } = false;
     private string InputFile => UseTestInput ? Path.Combine(InputDir, $"{GetNumber():D2}_test.txt") : Path.Combine(InputDir, $"{GetNumber():D2}.txt");
     protected string Input => File.ReadAllText(InputFile);
-    private int GetNumber()
+
+    public int GetNumber()
     {
         string typeName = GetType().Name;
         return int.TryParse(typeName[(typeName.IndexOf(ClassPrefix, StringComparison.Ordinal) + ClassPrefix.Length)..], out int i) ? i : default;

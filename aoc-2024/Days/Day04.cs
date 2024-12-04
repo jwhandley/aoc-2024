@@ -15,31 +15,8 @@ public class Day04 : BaseDay
         (-1, 1), // Up-Right
         (1, 1) // Down-Right
     ];
-    
-    private static readonly char[] Target = ['X', 'M', 'A', 'S'];
 
-    private static readonly string[] Patterns = [
-        """
-        M.M
-        .A.
-        S.S
-        """,
-        """
-        M.S
-        .A.
-        M.S
-        """,
-        """
-        S.S
-        .A.
-        M.M
-        """,
-        """
-        S.M
-        .A.
-        S.M
-        """
-    ];
+    private static readonly char[] Target = ['X', 'M', 'A', 'S'];
 
     public Day04()
     {
@@ -75,37 +52,22 @@ public class Day04 : BaseDay
         return true;
     }
 
-    private bool HasPattern(int r, int c, string[] pattern)
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                if (pattern[i][j] == '.') continue;
-                int y = r + i;
-                int x = c + j;
-                if (x < 0 || x >= lines.Length || y < 0 || y >= lines.Length) return false;
-                
-                if (lines[y][x] != pattern[i][j]) return false;
-            }
-        }
-        
-        
-        return true;
-    }
-
-
     public override long Part2()
     {
         int count = 0;
-        for (int r = 0; r < lines.Length; r++)
+        for (int r = 1; r < lines.Length - 1; r++)
         {
-            for (int c = 0; c < lines[0].Length; c++)
+            for (int c = 1; c < lines[0].Length - 1; c++)
             {
-                if (Patterns.Any(pattern => HasPattern(r, c, pattern.Split('\n'))))
-                {
-                    count++;
-                }
+                if (lines[r][c] != 'A') continue;
+                if (lines[r - 1][c + 1] == 'M' && lines[r - 1][c - 1] == 'M' && lines[r + 1][c + 1] == 'S' &&
+                    lines[r + 1][c - 1] == 'S') count++;
+                if (lines[r - 1][c + 1] == 'S' && lines[r - 1][c - 1] == 'S' && lines[r + 1][c + 1] == 'M' &&
+                    lines[r + 1][c - 1] == 'M') count++;
+                if (lines[r - 1][c + 1] == 'M' && lines[r - 1][c - 1] == 'S' && lines[r + 1][c + 1] == 'M' &&
+                    lines[r + 1][c - 1] == 'S') count++;
+                if (lines[r - 1][c + 1] == 'S' && lines[r - 1][c - 1] == 'M' && lines[r + 1][c + 1] == 'S' &&
+                    lines[r + 1][c - 1] == 'M') count++;
             }
         }
 

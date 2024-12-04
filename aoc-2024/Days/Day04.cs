@@ -54,10 +54,7 @@ public class Day04 : BaseDay
             for (int c = 0; c < lines[0].Length; c++)
             {
                 if (lines[r][c] != 'X') continue;
-                foreach (var dir in Directions)
-                {
-                    if (IsXmas(r, c, dir)) count++;
-                }
+                count += Directions.Count(dir => IsXmas(r, c, dir));
             }
         }
 
@@ -105,12 +102,9 @@ public class Day04 : BaseDay
         {
             for (int c = 0; c < lines[0].Length; c++)
             {
-
-                foreach (string pattern in Patterns)
+                if (Patterns.Any(pattern => HasPattern(r, c, pattern.Split('\n'))))
                 {
-                    if (!HasPattern(r, c, pattern.Split('\n'))) continue;
                     count++;
-                    break;
                 }
             }
         }

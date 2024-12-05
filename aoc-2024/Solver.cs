@@ -42,22 +42,22 @@ public static class Solver
             case >= TimeSpan.TicksPerSecond:
             {
                 double seconds = totalTicks / (double)TimeSpan.TicksPerSecond;
-                return $"{seconds:F2} s";
+                return $"{seconds:F0} s";
             }
             case >= TimeSpan.TicksPerMillisecond:
             {
                 double milliseconds = totalTicks / (double)TimeSpan.TicksPerMillisecond;
-                return $"{milliseconds:F2} ms";
+                return $"{milliseconds:F0} ms";
             }
             case >= 10:
             {
                 double microseconds = totalTicks / 10.0;
-                return $"{microseconds:F2} µs";
+                return $"{microseconds:F0} µs";
             }
             default:
             {
                 double nanoseconds = totalTicks * 100;
-                return $"{nanoseconds:F2} ns";
+                return $"{nanoseconds:F0} ns";
             }
         }
     }

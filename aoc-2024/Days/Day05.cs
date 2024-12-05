@@ -2,45 +2,35 @@ namespace aoc_2024.Days;
 
 public class Day05 : BaseDay
 {
-    private readonly List<int[]> updates;
-    private readonly Dictionary<int, List<int>> graph;
+    private readonly IReadOnlyCollection<List<int>> updates;
+
+    private readonly HashSet<(int lo, int hi)> ruleSet;
 
     public Day05()
     {
         string[] parts = Input.Split("\n\n");
 
-        List<(int, int)> rules = parts[0]
-            .Split('\n')
-            .Select(l => l.Split('|')
+        ruleSet = parts[0].Split('\n')
+            .Select(l => l.Split('|'))
+            .Select(rule => (int.Parse(rule[0]), int.Parse(rule[1])))
+            .ToHashSet();
+
+
+        updates = parts[1].Split('\n')
+            .Select(l => l.Split(',')
                 .Select(int.Parse)
-                .ToArray())
-            .Select(r => (r[0], r[1])).ToList();
-
-        graph = [];
-        foreach ((int lo, int hi) in rules)
-        {
-            if (!graph.ContainsKey(lo))
-            {
-                graph.Add(lo, []);
-            }
-
-            graph[lo].Add(hi);
-        }
-
-        updates = parts[1].Split('\n').Select(l => l.Split(',').Select(int.Parse).ToArray()).ToList();
+                .ToList())
+            .ToList();
     }
 
-    public override long Part1() => updates.Where(IsSorted).Sum(update => update[update.Length / 2]);
+    public override long Part1() => updates.Where(IsSorted).Sum(update => update[update.Count / 2]);
 
-    private bool IsSorted(int[] update)
+    private bool IsSorted(List<int> update)
     {
-        for (int i = 0; i < update.Length; i++)
+        for (int i = 1; i < update.Count; i++)
         {
-            for (int j = i + 1; j < update.Length; j++)
-            {
-                if (!graph.TryGetValue(update[j], out List<int>? value) || !value.Contains(update[i])) continue;
+            if (ruleSet.Contains((update[i], update[i - 1])))
                 return false;
-            }
         }
 
         return true;
@@ -48,22 +38,13 @@ public class Day05 : BaseDay
 
     private int Compare(int i, int j)
     {
-        if (graph.TryGetValue(i, out List<int>? v1) && v1.Contains(j))
-        {
-            return -1;
-        }
-
-        if (graph.TryGetValue(j, out List<int>? v2) && v2.Contains(i))
-        {
-            return 1;
-        }
-
-        return 0;
+        if (ruleSet.Contains((i, j))) return -1;
+        return ruleSet.Contains((j, i)) ? 1 : 0;
     }
 
     public override long Part2() => updates.Where(u => !IsSorted(u)).Sum(u =>
     {
-        Array.Sort(u, Compare);
-        return u[u.Length / 2];
+        u.Sort(Compare);
+        return u[u.Count / 2];
     });
 }

@@ -73,6 +73,6 @@ public class Day06 : BaseDay
         }
     }
 
-    public override long Part2() => Path().Where(pos => pos != guardStart).Count(InLoop);
+    public override long Part2() => Path().Where(pos => pos != guardStart).AsParallel().Count(InLoop);
     
 }

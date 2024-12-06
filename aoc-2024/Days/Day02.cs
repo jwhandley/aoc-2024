@@ -2,10 +2,9 @@ namespace aoc_2024.Days;
 
 public class Day02 : BaseDay
 {
-    public override long Part1()
-    {
-        return Input.Split('\n').Count(line => IsSafe(line.Split(' ').Select(int.Parse).ToArray()));
-    }
+    public override long Part1() =>
+        Input.Split('\n')
+            .Count(line => IsSafe(line.Split(' ').Select(int.Parse).ToArray()));
 
     private static bool IsSafe(int[] report)
     {
@@ -25,7 +24,7 @@ public class Day02 : BaseDay
     {
         for (int ignore = 0; ignore < report.Length; ignore++)
         {
-            int[] modifiedReport = new int[report.Length-1];
+            int[] modifiedReport = new int[report.Length - 1];
             int j = 0;
             for (int i = 0; i < report.Length; i++)
             {
@@ -33,16 +32,14 @@ public class Day02 : BaseDay
                 modifiedReport[j] = report[i];
                 j++;
             }
-            
+
             if (IsSafe(modifiedReport)) return true;
         }
 
         return false;
     }
 
-   
-    public override long Part2()
-    {
-        return Input.Split('\n').Count(line => IsSafeWithRemoval(line.Split(' ').Select(int.Parse).ToArray()));
-    }
+
+    public override long Part2() =>
+        Input.Split('\n').Count(line => IsSafeWithRemoval(line.Split(' ').Select(int.Parse).ToArray()));
 }

@@ -22,7 +22,7 @@ public class Day06 : BaseDay
             }
         }
         
-        throw new InvalidOperationException("No guard found");
+        return (0, 0);
     }
     
     private bool InBounds(int r, int c) => r >= 0 && r < grid.Length && c >= 0 && c < grid[0].Length;
@@ -43,10 +43,9 @@ public class Day06 : BaseDay
             {
                 (dr, dc) = (dc, -dr);
             }
-            else
-            {
-                guard = (guard.r + dr, guard.c + dc);    
-            }
+            
+            guard = (guard.r + dr, guard.c + dc);    
+            
         }
         
         return visited;
@@ -61,17 +60,16 @@ public class Day06 : BaseDay
 
         while (true)
         {
-            if (!visited.Add((guard.r, guard.c, dr, dc))) return true;
-            if (!InBounds(guard.r + dr, guard.c + dc)) return false;
             
-            if (grid[guard.r + dr][guard.c + dc] != '#' && (guard.r + dr, guard.c + dc) != obstruction)
+            if (!InBounds(guard.r + dr, guard.c + dc)) return false;
+
+            if (grid[guard.r + dr][guard.c + dc] == '#' || (guard.r + dr, guard.c + dc) == obstruction)
             {
-                guard = (guard.r + dr, guard.c + dc);
-            }
-            else
-            {
+                if (!visited.Add((guard.r, guard.c, dr, dc))) return true;
                 (dr, dc) = (dc, -dr);
             }
+
+            guard = (guard.r + dr, guard.c + dc);
         }
     }
 

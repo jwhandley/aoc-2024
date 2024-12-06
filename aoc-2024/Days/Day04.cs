@@ -41,7 +41,7 @@ public class Day04 : BaseDay
 
     private bool IsXmas(int r, int c, (int dr, int dc) dir)
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 1; i < 4; i++)
         {
             int x = c + dir.dc * i;
             int y = r + dir.dr * i;

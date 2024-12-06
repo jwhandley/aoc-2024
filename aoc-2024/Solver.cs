@@ -2,17 +2,13 @@ using System.Diagnostics;
 
 namespace aoc_2024;
 
-public static class Solver
+public class Solver(string inputPath)
 {
-    public static void SolveAll()
+    private string InputPath { get; } = inputPath;
+
+    public void SolveAll()
     {
-        BaseDay.UseTestInput = false;
-        RunAll();
-    }
-    
-    public static void TestAll()
-    {
-        BaseDay.UseTestInput = true;
+        BaseDay.InputDir = InputPath;
         RunAll();
     }
 
@@ -32,8 +28,11 @@ public static class Solver
             Console.WriteLine($"Day {instance.GetNumber()} Part 2: {instance.Part2()} ({watch.Elapsed.Format()})");
         }
     }
-    
-    private static string Format(this TimeSpan timeSpan)
+}
+
+public static class TimespanExtensions
+{
+    public static string Format(this TimeSpan timeSpan)
     {
         long totalTicks = timeSpan.Ticks;
 

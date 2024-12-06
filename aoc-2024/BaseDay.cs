@@ -3,10 +3,8 @@ namespace aoc_2024;
 public abstract class BaseDay
 {
     private const string ClassPrefix = "Day";
-    private const string InputDir = "Inputs";
-    
-    public static bool UseTestInput { get; set; } = false;
-    private string InputFile => UseTestInput ? Path.Combine(InputDir, $"{GetNumber():D2}_test.txt") : Path.Combine(InputDir, $"{GetNumber():D2}.txt");
+    public static string InputDir { get; set; } = "Inputs";
+    private string InputFile => Path.Combine(InputDir, $"{GetNumber():D2}.txt");
     protected string Input => File.ReadAllText(InputFile);
 
     public int GetNumber()

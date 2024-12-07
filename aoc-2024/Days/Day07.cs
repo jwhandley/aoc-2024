@@ -16,20 +16,20 @@ public class Day07 : BaseDay
     }
 
     public override long Part1() => equations.AsParallel()
-        .Where(e => SolveRecursive(e.Target, e.Numbers, e.Numbers.Length - 1)).Sum(e => e.Target);
+        .Where(e => SolveRecursive(e.Target, e.Numbers)).Sum(e => e.Target);
 
     public override long Part2() => equations.AsParallel()
-        .Where(e => SolveRecursive(e.Target, e.Numbers, e.Numbers.Length - 1, true)).Sum(e => e.Target);
+        .Where(e => SolveRecursive(e.Target, e.Numbers, true)).Sum(e => e.Target);
 
-    private static bool SolveRecursive(long target, long[] numbers, int idx, bool part2 = false)
+    private static bool SolveRecursive(long target, long[] numbers, bool useConcat = false, int idx = 0)
     {
-        if (idx == 0) return target == numbers[0];
+        if (idx == numbers.Length-1) return target == numbers[0];
 
-        long currentNumber = numbers[idx];
-        if (CanDivide(target, currentNumber) && SolveRecursive(target / currentNumber, numbers, idx - 1, part2)) return true;
-        if (CanSubtract(target, currentNumber) && SolveRecursive(target - currentNumber, numbers, idx - 1, part2)) return true;
-        if (!part2 || !CanStripSuffix(target, currentNumber, out long nextTarget)) return false;
-        return SolveRecursive(nextTarget, numbers, idx - 1, part2);
+        long currentNumber = numbers[numbers.Length - 1 - idx];
+        if (CanDivide(target, currentNumber) && SolveRecursive(target / currentNumber, numbers, useConcat, idx+1)) return true;
+        if (CanSubtract(target, currentNumber) && SolveRecursive(target - currentNumber, numbers, useConcat, idx+1)) return true;
+        if (!useConcat || !CanStripSuffix(target, currentNumber, out long nextTarget)) return false;
+        return SolveRecursive(nextTarget, numbers,  useConcat, idx+1);
     }
 
 

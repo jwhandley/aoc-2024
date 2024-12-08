@@ -24,7 +24,6 @@ public class Day07 : BaseDay
     private static bool SolveRecursive(long target, long[] numbers, bool useConcat = false, int idx = 0)
     {
         if (idx == numbers.Length-1) return target == numbers[0];
-
         long currentNumber = numbers[numbers.Length - 1 - idx];
         if (CanDivide(target, currentNumber) && SolveRecursive(target / currentNumber, numbers, useConcat, idx+1)) return true;
         if (CanSubtract(target, currentNumber) && SolveRecursive(target - currentNumber, numbers, useConcat, idx+1)) return true;

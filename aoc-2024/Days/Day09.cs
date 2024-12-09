@@ -2,22 +2,20 @@ namespace aoc_2024.Days;
 
 public class Day09 : BaseDay
 {
-    private readonly int[] blocks;
+    private readonly int?[] blocks;
     private readonly List<(int idx, int length)> files;
-    private readonly List<(int idx, int length)> emptySpaces;
-    private readonly List<int> blanks;
+    private readonly HashSet<(int idx, int length)> emptySpaces;
 
     public Day09()
     {
         blocks = [];
         files = [];
         emptySpaces = [];
-        blanks = [];
         
         char[] c = Input.ToCharArray();
         int size = c.Select(v => v - '0').Sum();
         
-        blocks = new int[size];
+        blocks = new int?[size];
         int idx = 0;
         for (int i = 0; i < c.Length; ++i)
         {
@@ -27,8 +25,7 @@ public class Day09 : BaseDay
                 emptySpaces.Add((idx, v));
                 for (int j = 0; j < v; ++j)
                 {
-                    blocks[idx] = -1;
-                    blanks.Add(idx);
+                    blocks[idx] = null;
                     idx++;
                 }
             }
@@ -46,25 +43,20 @@ public class Day09 : BaseDay
 
     public override long Part1()
     {
-        int[] blocksCopy = [..blocks];
-        int right = blocksCopy.Length - 1;
-        foreach (int idx in blanks)
+        int head = 0;
+        int tail = blocks.Length - 1;
+        while (true)
         {
-            while (blocksCopy[right] == -1) right--;
-            if (right <= idx) break;
-            blocksCopy[idx] = blocksCopy[right];
-            blocksCopy[right] = -1;
-            right--;
+            while (blocks[head] != null) head++;
+            while (blocks[tail] == null) tail--;
+
+            if (head >= tail) break;
+            
+            blocks[head++] = blocks[tail];
+            blocks[tail--] = null;
         }
         
-        long result = 0;
-        for (int i = 0; i < right+1; i++)
-        {
-            if (blocksCopy[i] == -1) continue;
-            result += blocksCopy[i] * i;
-        }
-
-        return result;
+        return blocks.Select((v, i) => v == null ? 0L : (long)v * i).Sum();
     }
 
     public override long Part2()
@@ -73,23 +65,15 @@ public class Day09 : BaseDay
         {
             (int idx, int length) = files[i];
 
-            foreach ((int j, (int start, int size)) in emptySpaces.Index())
+            foreach ((int start, int size) in emptySpaces)
             {
-                if (start >= idx)
-                {
-                    emptySpaces.RemoveAt(j);
-                    break;
-                }
-
-                if (size < length) continue;
+                if (size < length || start >= idx) continue;
                 files[i] = (start, length);
-                if (size == length)
+                emptySpaces.Remove((start, size));
+                
+                if (size != length)
                 {
-                    emptySpaces.RemoveAt(j);
-                }
-                else
-                {
-                    emptySpaces[j] = (start + length, size - length);
+                    emptySpaces.Add((start + length, size - length));
                 }
 
                 break;
@@ -108,3 +92,4 @@ public class Day09 : BaseDay
         return result;
     }
 }
+

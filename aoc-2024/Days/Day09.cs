@@ -107,22 +107,4 @@ public class Day09 : BaseDay
 
         return result;
     }
-
-    private int? FirstEmptySpace(int length)
-    {
-        for (int i = 0; i + length < blocks.Length; ++i)
-        {
-            if (blocks[i] != -1) continue;
-
-            bool found = true;
-            for (int j = 0; j < length; ++j)
-            {
-                if (blocks[i + j] != -1) found = false;
-            }
-
-            if (found) return i;
-        }
-
-        return null;
-    }
 }

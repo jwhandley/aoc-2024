@@ -61,13 +61,11 @@ public class Day10 : BaseDay
         Queue<(int r, int c)> queue = new();
         queue.Enqueue((startRow, startCol));
         
-        // HashSet<(int r, int c)> visited = [];
         int count = 0;
         while (queue.Count > 0)
         {
             (int r, int c) = queue.Dequeue();
             if (Grid[r, c] == 9) count++;
-            // if (!visited.Add((r,c))) continue;
 
             foreach ((int dr, int dc) in Dirs)
             {

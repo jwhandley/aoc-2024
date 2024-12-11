@@ -3,7 +3,7 @@ namespace aoc_2024.Days;
 public class Day11 : BaseDay
 {
     private readonly int[] startingNumbers;
-    private readonly Dictionary<(long n, int depth), long> cache = [];
+    private readonly Dictionary<(long n, int remaining), long> cache = [];
 
     public Day11()
     {
@@ -36,32 +36,35 @@ public class Day11 : BaseDay
         return result;
     }
 
-    private long DepthFirstSearch(long number, int maxDepth, int depth = 0)
+    private static (long left, long right) SplitNumber(long number, int digits)
     {
-        if (depth == maxDepth) return 1;
-        if (cache.TryGetValue((number, depth), out long result)) return result;
+        long left = number / IntPow(10, digits/2);
+        long right = number % IntPow(10, digits/2);
+        return (left, right);
+    }
+
+    private long DepthFirstSearch(long number, int remaining)
+    {
+        if (cache.TryGetValue((number, remaining), out long result)) return result;
+        if (remaining == 0) return 1;
 
         if (number == 0)
         {
-            cache[(number, depth)] = DepthFirstSearch(1, maxDepth, depth + 1); 
-            return cache[(number, depth)];
+            cache[(number, remaining)] = DepthFirstSearch(1, remaining - 1); 
+            return cache[(number, remaining)];
         }
+        
         int digits = CountDigits(number);
         if (digits % 2 == 0)
         {
-            long left = number / IntPow(10, digits / 2);
-            long right = number % IntPow(10, digits / 2);
-            cache[(number, depth)] = DepthFirstSearch(left, maxDepth, depth + 1) + DepthFirstSearch(right, maxDepth, depth + 1);
-            return cache[(number, depth)];
+            (long left, long right) = SplitNumber(number, digits);
+            cache[(number, remaining)] = DepthFirstSearch(left, remaining-1) + DepthFirstSearch(right, remaining - 1);
+            return cache[(number, remaining)];
         }
 
-        cache[(number, depth)] = DepthFirstSearch(number * 2024, maxDepth, depth + 1);
-        return cache[(number, depth)];
+        cache[(number, remaining)] = DepthFirstSearch(number * 2024, remaining - 1);
+        return cache[(number, remaining)];
     }
 
-    public override long Part2()
-    {
-        cache.Clear();
-        return startingNumbers.Sum(n => DepthFirstSearch(n, 75));  
-    } 
+    public override long Part2() => startingNumbers.Sum(n => DepthFirstSearch(n, 75));
 }

@@ -20,15 +20,15 @@ public class Day12 : BaseDay
 
     private readonly struct Point(int row, int col)
     {
-        public int Row { get; init; } = row;
-        public int Col { get; init; } = col;
+        public int Row { get; } = row;
+        public int Col { get; } = col;
         
         public static Point operator+(Point p1, Point p2) => new(p1.Row + p2.Row, p1.Col + p2.Col);
         
-        public static Point Down = new(1, 0);
-        public static Point Left = new(0, -1);
-        public static Point Right = new(0, 1);
-        public static Point Up = new(-1, 0);
+        public static readonly Point Down = new(1, 0);
+        public static readonly Point Left = new(0, -1);
+        public static readonly Point Right = new(0, 1);
+        public static readonly Point Up = new(-1, 0);
 
         public static IEnumerable<Point> Dirs()
         {
@@ -39,11 +39,10 @@ public class Day12 : BaseDay
         }
     }
 
-    private readonly struct Region(char type, HashSet<Point> points, HashSet<(Point p1, Point p2)> boundary)
+    private readonly struct Region(List<Point> points, HashSet<(Point p1, Point p2)> boundary)
     {
-        private HashSet<Point> Points { get; } = points;
+        private List<Point> Points { get; } = points;
         private HashSet<(Point p1, Point p2)> Boundary { get; } = boundary;
-        public char Type { get; } = type;
 
         public int Area() => Points.Count;
         public int Perimeter() => Boundary.Count;
@@ -52,9 +51,9 @@ public class Day12 : BaseDay
         {
             int count = 0;
             
-            foreach ((Point p1, Point p2) in Boundary)
+            foreach (var (p1, p2) in Boundary)
             {
-                if (Boundary.Contains((p1 + Point.Down, p2 + Point.Down)))
+                if (Boundary.Contains((p1 + Point.Up, p2 + Point.Up)))
                 {
                     continue;
                 }
@@ -73,12 +72,10 @@ public class Day12 : BaseDay
     
     private bool InBounds(Point p) => p is { Row: >= 0, Col: >= 0 } && p.Row < Grid.GetLength(0) && p.Col < Grid.GetLength(1);
 
-    private List<Region> BreadthFirstSearch()
+    private List<Region> FloodFill()
     {
         bool[,] visited = new bool[Grid.GetLength(0), Grid.GetLength(1)];
         List<Region> regions = [];
-
-        
 
         for (int r = 0; r < Grid.GetLength(0); r++)
         {
@@ -89,12 +86,12 @@ public class Day12 : BaseDay
                 
                 Queue<Point> queue = [];
                 queue.Enqueue(new Point(r, c));
-                HashSet<Point> seen = [];
+                List<Point> seen = [];
                 HashSet<(Point p1, Point p2)> boundaries = [];
 
                 while (queue.Count > 0)
                 {
-                    Point current = queue.Dequeue();
+                    var current = queue.Dequeue();
                     
                     if (!InBounds(current)) continue;
                     if (visited[current.Row, current.Col]) continue;
@@ -116,9 +113,7 @@ public class Day12 : BaseDay
                     seen.Add(current);
                 }
                 
-                // Console.WriteLine($"{type}, {string.Join(", ", seen)}, {boundaries.Count}");
-                
-                regions.Add(new Region(type, seen, boundaries));
+                regions.Add(new Region(seen, boundaries));
             }
         }
         
@@ -126,7 +121,7 @@ public class Day12 : BaseDay
     }
 
     
-    public override long Part1() => BreadthFirstSearch().Sum(r => r.Area() * r.Perimeter());
+    public override long Part1() => FloodFill().Sum(r => r.Area() * r.Perimeter());
 
-    public override long Part2() => BreadthFirstSearch().Sum(r => r.Area() * r.Sides());
+    public override long Part2() => FloodFill().Sum(r => r.Area() * r.Sides());
 }

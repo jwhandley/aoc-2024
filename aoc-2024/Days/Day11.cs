@@ -1,3 +1,4 @@
+
 namespace aoc_2024.Days;
 
 public class Day11 : BaseDay

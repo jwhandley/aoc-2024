@@ -12,35 +12,13 @@ public class Day11 : BaseDay
 
     public override long Part1() => startingNumbers.Sum(n => DepthFirstSearch(n, 25));
 
-    private static int CountDigits(long number)
-    {
-        int count = 0;
-
-        while (number > 0)
-        {
-            number /= 10;
-            count++;
-        }
-
-        return count;
-    }
-
-    private static long IntPow(long number, int power)
-    {
-        long result = 1;
-        for (int i = 0; i < power; i++)
-        {
-            result *= number;
-        }
-
-        return result;
-    }
+    private static int CountDigits(long number) => number <= 9 ? 1 : (int)Math.Floor(Math.Log10(number)) + 1;
+    
 
     private static (long left, long right) SplitNumber(long number, int digits)
     {
-        long left = number / IntPow(10, digits/2);
-        long right = number % IntPow(10, digits/2);
-        return (left, right);
+        long power = (long)Math.Pow(10, digits);
+        return (number / power, number % power);
     }
 
     private long DepthFirstSearch(long number, int remaining)
@@ -57,7 +35,7 @@ public class Day11 : BaseDay
         int digits = CountDigits(number);
         if (digits % 2 == 0)
         {
-            (long left, long right) = SplitNumber(number, digits);
+            (long left, long right) = SplitNumber(number, digits/2);
             cache[(number, remaining)] = DepthFirstSearch(left, remaining-1) + DepthFirstSearch(right, remaining - 1);
             return cache[(number, remaining)];
         }

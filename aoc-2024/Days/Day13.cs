@@ -17,8 +17,6 @@ public partial class Day13 : BaseDay
             var buttonB = Point.Parse(parts[1]);
             var prize = Point.Parse(parts[2]);
             
-            // Console.WriteLine($"{buttonA}, {buttonB}, {prize}");
-            
             machines.Add((prize, buttonA, buttonB));
         }
     }
@@ -28,15 +26,10 @@ public partial class Day13 : BaseDay
         long result = 0;
         foreach (var (prize, buttonA, buttonB) in machines)
         {
-            long a11 = buttonA.X;
-            long a21 = buttonA.Y;
-            long a12 = buttonB.X;
-            long a22 = buttonB.Y;
+            long determinant = buttonA.X * buttonB.Y - buttonB.X * buttonA.Y; 
             
-            long determinant = a11 * a22 - a12 * a21; 
-            
-            long x1 = a22 * prize.X - a12 * prize.Y;
-            long x2 = -a21 * prize.X + a11 * prize.Y;
+            long x1 = buttonB.Y * prize.X - buttonB.X * prize.Y;
+            long x2 = -buttonA.Y * prize.X + buttonA.X * prize.Y;
             
             if (x1 % determinant != 0 || x2 % determinant != 0) continue;
             result += x1/determinant*3 + x2/determinant;
@@ -65,15 +58,11 @@ public partial class Day13 : BaseDay
         long result = 0;
         foreach (var (prize, buttonA, buttonB) in machines)
         {
-            long a11 = buttonA.X;
-            long a21 = buttonA.Y;
-            long a12 = buttonB.X;
-            long a22 = buttonB.Y;
             var target = new Point(prize.X + 10000000000000, prize.Y + 10000000000000);
-            long determinant = a11 * a22 - a12 * a21; 
+            long determinant = buttonA.X * buttonB.Y - buttonB.X * buttonA.Y; 
             
-            long x1 = a22 * target.X - a12 * target.Y;
-            long x2 = -a21 * target.X + a11 * target.Y;
+            long x1 = buttonB.Y * target.X - buttonB.X * target.Y;
+            long x2 = -buttonA.Y * target.X + buttonA.X * target.Y;
             
             if (x1 % determinant != 0 || x2 % determinant != 0) continue;
             result += x1/determinant*3 + x2/determinant;

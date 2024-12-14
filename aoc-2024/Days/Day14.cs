@@ -32,10 +32,12 @@ public class Day14 : BaseDay
         public Point Position { get; private set; } = position;
         private Point Velocity { get; } = velocity;
 
-        public void Update()
+        public void Update(int deltaTime = 1)
         {
-            int newX = (Position.X + Velocity.X + Width) % Width;
-            int newY = (Position.Y + Velocity.Y + Height) % Height;
+            int newX = (Position.X + Velocity.X * deltaTime) % Width;
+            if (newX < 0) newX += Width;
+            int newY = (Position.Y + Velocity.Y * deltaTime) % Height;
+            if (newY < 0) newY += Height;
             Position = new Point(newX, newY);
         }
 
@@ -47,9 +49,9 @@ public class Day14 : BaseDay
 
     private const int Width = 101;
     private const int Height = 103;
-    private static readonly bool drawTree = false;
-    
-    
+    private const bool DrawTree = false;
+
+
     private readonly List<Robot> robots;
     
     private static readonly Rect NorthWest = new(new Point(0, 0), Width/2-1, Height/2-1);
@@ -75,10 +77,7 @@ public class Day14 : BaseDay
     
     public override long Part1()
     {
-        for (int i = 0; i < 100; i++)
-        {
-            foreach (var robot in robots) robot.Update();
-        }
+        foreach (var robot in robots) robot.Update(100);
         
         return Score();
     }
@@ -109,7 +108,7 @@ public class Day14 : BaseDay
         
         foreach (var robot in robots) robot.Reset();
 
-        while (seconds < 10_000)
+        while (seconds < 10_403)
         {
             
             foreach (var robot in robots) robot.Update();
@@ -125,7 +124,7 @@ public class Day14 : BaseDay
             seconds++;
         }
         
-        if (drawTree) Console.WriteLine(tree);
+        if (DrawTree) Console.WriteLine(tree);
         return minSeconds;
     }
 
@@ -136,13 +135,13 @@ public class Day14 : BaseDay
         {
             for (int x = 0; x < Width; x++)
             {
-                grid[y, x] = ' ';
+                grid[y, x] = '.';
             }
         }
 
         foreach (var robot in robots)
         {
-            grid[robot.Position.Y, robot.Position.X] = 'x';
+            grid[robot.Position.Y, robot.Position.X] = '#';
         }
         
         

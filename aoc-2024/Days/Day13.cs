@@ -48,6 +48,8 @@ public partial class Day13 : BaseDay
             int[] nums = NumRegex().Matches(input).Select(m => int.Parse(m.Value)).ToArray();
             return new Point(nums[0], nums[1]);
         }
+        
+        public static Point One => new(1, 1);
 
         [GeneratedRegex(@"\d+")]
         private static partial Regex NumRegex();
@@ -58,7 +60,7 @@ public partial class Day13 : BaseDay
         long result = 0;
         foreach (var (prize, buttonA, buttonB) in machines)
         {
-            var target = new Point(prize.X + 10000000000000, prize.Y + 10000000000000);
+            var target = prize + Point.One * 10000000000000;
             long determinant = buttonA.X * buttonB.Y - buttonB.X * buttonA.Y; 
             
             long x1 = buttonB.Y * target.X - buttonB.X * target.Y;

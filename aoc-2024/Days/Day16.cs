@@ -1,7 +1,5 @@
 namespace aoc_2024.Days;
 
-using Graph = Dictionary<(int r, int c, Direction dir), HashSet<(int r, int c, Direction dir)>>;
-
 public enum Direction
 {
     North,
@@ -9,6 +7,8 @@ public enum Direction
     East,
     West
 }
+
+public readonly record struct State(int R, int C, Direction Dir);
 
 public class Day16 : BaseDay
 {
@@ -37,55 +37,92 @@ public class Day16 : BaseDay
 
     private int Dijkstra((int r, int c) start, (int r, int c) target)
     {
-        Dictionary<(int r, int c, Direction dir), int> dist = [];
+        Dictionary<State, int> dist = [];
 
-        var q = new PriorityQueue<(int r, int c, Direction, int d), int>();
-        q.Enqueue((start.r, start.c, Direction.East, 0), 0);
-        dist[(start.r, start.c, Direction.East)] = 0;
+        var q = new PriorityQueue<(State, int cost), int>();
+        var state = new State(start.r, start.c, Direction.East);
+        q.Enqueue((state, 0), 0);
+        dist[state] = 0;
 
         while (q.Count > 0)
         {
-            (int r, int c, var dir, int d) = q.Dequeue();
+            (var current, int cost) = q.Dequeue();
 
-            if (!InBounds(r, c) || grid[r, c] == '#') continue;
-
-            (int nr, int nc) = dir switch
+            if ((current.R, current.C) == target)
             {
-                Direction.North => (r - 1, c),
-                Direction.South => (r + 1, c),
-                Direction.East => (r, c + 1),
-                Direction.West => (r, c - 1),
+                return cost;
+            }
+
+            if (!InBounds(current.R, current.C) || grid[current.R, current.C] == '#') continue;
+            
+            int distance = dist.GetValueOrDefault(current, int.MaxValue);
+            if (distance < cost) continue;
+            dist[current] = cost;
+
+            (int nr, int nc) = current.Dir switch
+            {
+                Direction.North => (current.R - 1, current.C),
+                Direction.South => (current.R + 1, current.C),
+                Direction.East => (current.R, current.C + 1),
+                Direction.West => (current.R, current.C - 1),
                 _ => throw new ArgumentOutOfRangeException()
             };
+            
+            q.Enqueue((current with {R = nr, C = nc}, cost + 1), cost + 1);
+            
+            var left = RotateLeft(current.Dir);
+            q.Enqueue((current with {Dir = left}, cost + 1000), cost + 1000);
+            
+            var right = RotateRight(current.Dir);
+            q.Enqueue((current with {Dir = right}, cost + 1000), cost + 1000);
+        }
+        
+        throw new Exception("No paths found");
+    }
+    
+    private int ShortestPaths((int r, int c) start, (int r, int c) target)
+    {
+        Dictionary<State, int> dist = [];
+        Dictionary<State, HashSet<State>> prev = [];
+        var q = new PriorityQueue<(State curr, State? prev, int cost), int>();
+        var state = new State(start.r, start.c, Direction.East);
+        q.Enqueue((state, null, 0), 0);
+        dist[state] = 0;
 
-            int distance = dist.GetValueOrDefault((nr, nc, dir), int.MaxValue);
-
-            if (distance > d + 1)
+        while (q.Count > 0)
+        {
+            (var current, State? previous, int cost) = q.Dequeue();
+            if (!InBounds(current.R, current.C) || grid[current.R, current.C] == '#') continue;
+            
+            int distance = dist.GetValueOrDefault(current, int.MaxValue);
+            if (distance < cost) continue;
+            dist[current] = cost;
+            
+            if (!prev.ContainsKey(current)) prev[current] = [];
+            if (previous is { } previousState)
             {
-                dist[(nr, nc, dir)] = d + 1;
-                q.Enqueue((nr, nc, dir, d + 1), d + 1);
+                prev[current].Add(previousState);    
             }
 
-
-            var left = RotateLeft(dir);
-            int leftDistance = dist.GetValueOrDefault((r, c, left), int.MaxValue);
-            if (leftDistance > d + 1000)
+            (int nr, int nc) = current.Dir switch
             {
-                dist[(r, c, left)] = d + 1000;
-                q.Enqueue((r, c, left, d + 1000), d + 1000);
-            }
-
-
-            var right = RotateRight(dir);
-            int rightDistance = dist.GetValueOrDefault((r, c, right), int.MaxValue);
-            if (rightDistance > d + 1000)
-            {
-                dist[(r, c, right)] = d + 1000;
-                q.Enqueue((r, c, right, d + 1000), d + 1000);
-            }
+                Direction.North => (current.R - 1, current.C),
+                Direction.South => (current.R + 1, current.C),
+                Direction.East => (current.R, current.C + 1),
+                Direction.West => (current.R, current.C - 1),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            
+            q.Enqueue((current with {R = nr, C = nc}, current, cost + 1), cost + 1);
+            
+            var left = RotateLeft(current.Dir);
+            q.Enqueue((current with {Dir = left}, current, cost + 1000), cost + 1000);
+            
+            var right = RotateRight(current.Dir);
+            q.Enqueue((current with {Dir = right}, current, cost + 1000), cost + 1000);
         }
 
-        return dist.Where(e => (e.Key.r, e.Key.c) == target).Min(e => e.Value);
+        return CheckPaths(prev, new State(target.r, target.c, Direction.East), new State(start.r, start.c, Direction.East));
     }
 
 
@@ -110,83 +147,12 @@ public class Day16 : BaseDay
 
     private bool InBounds(int r, int c) => r >= 0 && r < height && c >= 0 && c < width;
     
-    private int ShortestPaths((int r, int c) start, (int r, int c) target)
-    {
-        Dictionary<(int r, int c, Direction dir), int> dist = [];
-        Dictionary<(int r, int c, Direction dir), HashSet<(int r, int c, Direction dir)>> prev = [];
-        for (int r = 0; r < height; r++)
-        {
-            for (int c = 0; c < width; c++)
-            {
-                prev[(r, c, Direction.North)] = [];
-                prev[(r, c, Direction.South)] = [];
-                prev[(r, c, Direction.East)] = [];
-                prev[(r, c, Direction.West)] = [];
-            }
-        }
-
-        var q = new PriorityQueue<(int r, int c, Direction, int d), int>();
-        q.Enqueue((start.r, start.c, Direction.East, 0), 0);
-        dist[(start.r, start.c, Direction.East)] = 0;
-
-        while (q.Count > 0)
-        {
-            (int r, int c, var dir, int d) = q.Dequeue();
-
-            if (!InBounds(r, c) || grid[r, c] == '#') continue;
-
-            (int nr, int nc) = dir switch
-            {
-                Direction.North => (r - 1, c),
-                Direction.South => (r + 1, c),
-                Direction.East => (r, c + 1),
-                Direction.West => (r, c - 1),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            int distance = dist.GetValueOrDefault((nr, nc, dir), int.MaxValue);
-
-            if (distance > d + 1)
-            {
-                prev[(nr, nc, dir)] = [(r, c, dir)];
-                dist[(nr, nc, dir)] = d + 1;
-                q.Enqueue((nr, nc, dir, d + 1), d + 1);
-            }
-            else if (distance == d + 1)
-            {
-                prev[(nr, nc, dir)].Add((r, c, dir));
-                q.Enqueue((nr, nc, dir, d + 1), d + 1);
-            }
-
-
-            var left = RotateLeft(dir);
-            int leftDistance = dist.GetValueOrDefault((r, c, left), int.MaxValue);
-            if (leftDistance > d + 1000)
-            {
-                prev[(r, c, left)] = [(r, c, dir)];
-                dist[(r, c, left)] = d + 1000;
-                q.Enqueue((r, c, left, d + 1000), d + 1000);
-            }
-
-
-            var right = RotateRight(dir);
-            int rightDistance = dist.GetValueOrDefault((r, c, right), int.MaxValue);
-            if (rightDistance > d + 1000)
-            {
-                prev[(r, c, right)] = [(r, c, dir)];
-                dist[(r, c, right)] = d + 1000;
-                q.Enqueue((r, c, right, d + 1000), d + 1000);
-            }
-        }
-
-        return CheckPaths(prev, (target.r, target.c, Direction.East), (start.r, start.c, Direction.East));
-    }
-
-    private static int CheckPaths(Graph graph, (int r, int c, Direction dir) start, (int r, int c, Direction dir) target)
+    
+    private static int CheckPaths(Dictionary<State, HashSet<State>> graph, State start, State target)
     {
         HashSet<(int r, int c)> seen = [];
-        List<(int r, int c, Direction dir)> path = [start];
-        Queue<List<(int r, int c, Direction dir)>> queue = [];
+        List<State> path = [start];
+        Queue<List<State>> queue = [];
         queue.Enqueue(path);
 
         while (queue.Count > 0)
@@ -207,7 +173,7 @@ public class Day16 : BaseDay
             foreach (var nbr in graph[last])
             {
                 if (path.Contains(nbr)) continue;
-                List<(int r, int c, Direction dir)> newPath = [..path, nbr];
+                List<State> newPath = [..path, nbr];
                 queue.Enqueue(newPath);
             }
         }

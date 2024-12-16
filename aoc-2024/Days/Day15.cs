@@ -7,11 +7,15 @@ public class Day15 : BaseDay
     private readonly char[,] grid;
     private readonly Vector2 startPos;
     private readonly List<Vector2> moves;
+    private readonly int width;
+    private readonly int height;
 
     public Day15()
     {
         string[] parts = Input.Split("\n\n");
-            grid = new char[parts[0].Split('\n').Length, parts[0].Split('\n')[0].Length];
+        height = parts[0].Split('\n').Length;
+        width = parts[0].Split('\n')[0].Length;
+        grid = new char[height, width];
         foreach ((int r, string line) in parts[0].Split('\n').Index())
         {
             foreach ((int c, char ch) in line.Index())
@@ -22,35 +26,23 @@ public class Day15 : BaseDay
             }
         }
 
-        moves = [];
-        foreach (char c in parts[1])
+        moves = parts[1].Select(c => c switch
         {
-            switch (c)
-            {
-                case '^':
-                    
-                    moves.Add(new Vector2(0, -1));
-                    break;
-                case 'v':
-                    moves.Add(new Vector2(0, 1));
-                    break;
-                case '<':
-                    moves.Add(new Vector2(-1, 0));
-                    break;
-                case '>':
-                    moves.Add(new Vector2(1, 0));
-                    break;
-            }
-        }
+            '^' => new Vector2(0, -1),
+            'v' => new Vector2(0, 1),
+            '<' => new Vector2(-1, 0),
+            '>' => new Vector2(1, 0),
+            _ => Vector2.Zero
+        }).ToList();
     }
-    
-    private IEnumerable<Body> LoadBodies(int width, char target)
+
+    private IEnumerable<Body> LoadBodies(int w, char target)
     {
-        for (int r = 0; r < grid.GetLength(0); r++)
+        for (int r = 0; r < height; r++)
         {
-            for (int c = 0; c < grid.GetLength(1); c++)
+            for (int c = 0; c < width; c++)
             {
-                if (grid[r, c] == target) yield return new Body(new Vector2(c*width, r), width, 1); 
+                if (grid[r, c] == target) yield return new Body(new Vector2(c * w, r), w, 1);
             }
         }
     }
@@ -68,10 +60,8 @@ public class Day15 : BaseDay
 
         return CalculateScore(boxes);
     }
-    
-    
 
-    
+
     public override long Part2()
     {
         var robot = new Body(startPos with { X = startPos.X * 2 }, 1, 1);
@@ -85,13 +75,14 @@ public class Day15 : BaseDay
 
         return CalculateScore(boxes);
     }
-    
-    private static long CalculateScore(IEnumerable<Body> boxes) => boxes.Sum(b => (int)b.Position.Y*100 + (int)b.Position.X);
+
+    private static long CalculateScore(IEnumerable<Body> boxes) =>
+        boxes.Sum(b => (int)b.Position.Y * 100 + (int)b.Position.X);
 }
 
 public class Body(Vector2 pos, int width, int height)
 {
-    public Vector2 Position { get; private set; } = pos; 
+    public Vector2 Position { get; private set; } = pos;
     private int Width { get; } = width;
     private int Height { get; } = height;
 

@@ -10,8 +10,6 @@ public enum Direction
     West
 }
 
-
-
 public class Day16 : BaseDay
 {
     private readonly char[,] grid;
@@ -90,7 +88,6 @@ public class Day16 : BaseDay
         return dist.Where(e => (e.Key.r, e.Key.c) == target).Min(e => e.Value);
     }
 
-     
 
     private static Direction RotateLeft(Direction dir) => dir switch
     {
@@ -112,8 +109,8 @@ public class Day16 : BaseDay
 
 
     private bool InBounds(int r, int c) => r >= 0 && r < height && c >= 0 && c < width;
-
-    private int Test((int r, int c) start, (int r, int c) target)
+    
+    private int ShortestPaths((int r, int c) start, (int r, int c) target)
     {
         Dictionary<(int r, int c, Direction dir), int> dist = [];
         Dictionary<(int r, int c, Direction dir), HashSet<(int r, int c, Direction dir)>> prev = [];
@@ -121,7 +118,6 @@ public class Day16 : BaseDay
         {
             for (int c = 0; c < width; c++)
             {
-                
                 prev[(r, c, Direction.North)] = [];
                 prev[(r, c, Direction.South)] = [];
                 prev[(r, c, Direction.East)] = [];
@@ -155,13 +151,12 @@ public class Day16 : BaseDay
                 prev[(nr, nc, dir)] = [(r, c, dir)];
                 dist[(nr, nc, dir)] = d + 1;
                 q.Enqueue((nr, nc, dir, d + 1), d + 1);
-            } 
+            }
             else if (distance == d + 1)
             {
                 prev[(nr, nc, dir)].Add((r, c, dir));
                 q.Enqueue((nr, nc, dir, d + 1), d + 1);
             }
-             
 
 
             var left = RotateLeft(dir);
@@ -170,11 +165,6 @@ public class Day16 : BaseDay
             {
                 prev[(r, c, left)] = [(r, c, dir)];
                 dist[(r, c, left)] = d + 1000;
-                q.Enqueue((r, c, left, d + 1000), d + 1000);
-            }
-            else if (leftDistance == d + 1000)
-            {
-                prev[(r, c, left)].Add((r, c, dir));
                 q.Enqueue((r, c, left, d + 1000), d + 1000);
             }
 
@@ -187,17 +177,12 @@ public class Day16 : BaseDay
                 dist[(r, c, right)] = d + 1000;
                 q.Enqueue((r, c, right, d + 1000), d + 1000);
             }
-            else if (rightDistance == d + 1000)
-            {
-                prev[(r, c, right)].Add((r, c, dir));
-                q.Enqueue((r, c, right, d + 1000), d + 1000);
-            }
         }
-        
+
         return CheckPaths(prev, (target.r, target.c, Direction.East), (start.r, start.c, Direction.East));
     }
 
-    private int CheckPaths(Graph graph, (int r, int c, Direction dir) start, (int r, int c, Direction dir) target)
+    private static int CheckPaths(Graph graph, (int r, int c, Direction dir) start, (int r, int c, Direction dir) target)
     {
         HashSet<(int r, int c)> seen = [];
         List<(int r, int c, Direction dir)> path = [start];
@@ -229,12 +214,12 @@ public class Day16 : BaseDay
 
         return seen.Count;
     }
-    
+
 
     public override long Part1()
     {
         return Dijkstra(startPos, targetPos);
     }
 
-    public override long Part2() => Test(startPos, targetPos);
+    public override long Part2() => ShortestPaths(startPos, targetPos);
 }

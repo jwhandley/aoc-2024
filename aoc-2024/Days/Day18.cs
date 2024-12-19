@@ -51,17 +51,25 @@ public class Day18 : BaseDay
 
     public override long Part2()
     {
-        HashSet<(int x, int y)> fallen = [];
-        foreach (var barrier in barrierList)
+        int left = 0;
+        int right = barrierList.Count-1;
+
+        while (left < right)
         {
-            fallen.Add((barrier.x, barrier.y));
-            if (BreadthFirstSearch(0, 0, 70, 70, fallen) == -1)
+            int mid = (left + right) / 2;
+            HashSet<(int x, int y)> visited = barrierList.Take(mid+1).ToHashSet();
+
+            if (BreadthFirstSearch(0, 0, 70, 70, visited) != -1)
             {
-                Console.WriteLine(barrier);
-                return barrier.y * 70 + barrier.x;
+                left = mid + 1;
+            }
+            else
+            {
+                right = mid;
             }
         }
         
-        return 0;
+        Console.WriteLine(barrierList[left]);
+        return left;
     }
 }

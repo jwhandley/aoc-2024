@@ -65,30 +65,28 @@ public class Day09 : BaseDay
         {
             (int idx, int length) = files[i];
 
-            foreach ((int start, int size) in emptySpaces)
+            (int start, int size) = emptySpaces.FirstOrDefault(e=> e.length >= length && e.idx < idx);
+            if (size == 0) continue;
+            files[i] = (start, length);
+            emptySpaces.Remove((start, size));
+            if (size != length)
             {
-                if (size < length || start >= idx) continue;
-                files[i] = (start, length);
-                emptySpaces.Remove((start, size));
-                
-                if (size != length)
-                {
-                    emptySpaces.Add((start + length, size - length));
-                }
-
-                break;
+                emptySpaces.Add((start + length, size - length));
             }
         }
 
+        
         long result = 0;
         foreach ((int id, (int pos, int length)) in files.Index())
         {
+            long tmp = 0;
             for (int i = pos; i < pos + length; i++)
             {
-                result += id * i;
+                tmp += id * i;
             }
+            result += tmp;
         }
-
+        
         return result;
     }
 }

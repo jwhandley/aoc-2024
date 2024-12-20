@@ -5,8 +5,9 @@ namespace aoc_2024.Days;
 public class Day20 : BaseDay
 {
     private readonly Vector2 start;
-    private Vector2 end;
+    private readonly Vector2 end;
     private readonly HashSet<Vector2> walls;
+    private readonly List<Vector2> path;
     private readonly int width;
     private readonly int height;
 
@@ -32,51 +33,58 @@ public class Day20 : BaseDay
                 if (ch == 'E') end = new Vector2(c, r);
             }
         }
+
+        path = BreadthFirstSearch();
     }
 
-    private Dictionary<Vector2, int> BreadthFirstSearch()
+    private List<Vector2> BreadthFirstSearch()
     {
-        Queue<(Vector2, int d)> queue = new();
-        queue.Enqueue((start, 0));
-        Dictionary<Vector2, int> visited = [];
+        Queue<Vector2> queue = [];
+        queue.Enqueue(start);
+        List<Vector2> found = [];
+        HashSet<Vector2> visited = [];
 
         while (queue.Count > 0)
         {
-            var (current, dist) = queue.Dequeue();
-            if (!visited.TryAdd(current, dist)) continue;
+            var current = queue.Dequeue();
+            if (!visited.Add(current)) continue;
+            found.Add(current);
 
-            if (current == end) return visited;
+            if (current == end) return found;
 
             foreach (var dir in directions)
             {
                 if (!walls.Contains(current + dir) && InBounds(current + dir))
                 {
-                    queue.Enqueue((current + dir, dist + 1));
+                    queue.Enqueue(current + dir);
                 }
             }
         }
 
-        return visited;
+        return found;
     }
 
     private bool InBounds(Vector2 point) => point.X >= 0 && point.X < width && point.Y >= 0 && point.Y < height;
-    private int ManhattanDist(Vector2 a, Vector2 b) => (int)Math.Abs(a.X - b.X) + (int)Math.Abs(a.Y - b.Y);
+    private static int ManhattanDist(Vector2 a, Vector2 b) => (int)Math.Abs(a.X - b.X) + (int)Math.Abs(a.Y - b.Y);
 
     public override long Part1()
     {
-        Dictionary<Vector2, int> path = BreadthFirstSearch();
-        int cost = path[end];
+        Dictionary<Vector2, int> visited = path.Index().ToDictionary(p => p.Item, p => p.Index);
+
+        int cost = path.Count;
         int result = 0;
 
-        foreach ((var startCheat, int dist1) in path)
+        for (int i = 0; i < path.Count - 1; i++)
         {
             for (int dx = -2; dx <= 2; dx++)
             {
                 for (int dy = -2; dy <= 2; dy++)
                 {
-                    if (ManhattanDist(startCheat, startCheat + new Vector2(dx, dy)) != 2) continue;
-                    if (!path.TryGetValue(startCheat + new Vector2(dx, dy), out int dist2)) continue;
-                    int newCost = dist1 + (cost - dist2) + 2;
+                    var other = path[i] + new Vector2(dx, dy);
+                    if (!visited.TryGetValue(other, out int j)) continue;
+                    int distance = ManhattanDist(path[i], other);
+                    if (distance != 2) continue;
+                    int newCost = i + cost - j + distance;
                     if (cost - newCost >= 100) result++;
                 }
             }
@@ -87,16 +95,16 @@ public class Day20 : BaseDay
 
     public override long Part2()
     {
-        Dictionary<Vector2, int> path = BreadthFirstSearch();
-        int cost = path[end];
+        int cost = path.Count;
         int result = 0;
-        foreach ((var startCheat, int dist1) in path)
+
+        for (int i = 0; i < path.Count - 1; i++)
         {
-            foreach ((var endCheat, int dist2) in path)
+            for (int j = i + 1; j < path.Count; j++)
             {
-                if (ManhattanDist(startCheat, endCheat) > 20) continue;
-                int manhattan = ManhattanDist(startCheat, endCheat);
-                int newCost = dist1 + (cost - dist2) + manhattan;
+                int dist = ManhattanDist(path[i], path[j]);
+                if (dist > 20) continue;
+                int newCost = i + cost - j + dist;
                 if (cost - newCost >= 100) result++;
             }
         }

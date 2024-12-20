@@ -28,7 +28,7 @@ public class Day08 : BaseDay
         }
     }
 
-    public override long Part1()
+    public override string Part1()
     {
         HashSet<(int x, int y)> visited = [];
         foreach (List<(int x, int y)> list in Map.Values)
@@ -47,12 +47,12 @@ public class Day08 : BaseDay
             }
         }
 
-        return visited.Count(p => InBounds(p.x, p.y));
+        return visited.Count(p => InBounds(p.x, p.y)).ToString();
     }
 
     private bool InBounds(int x, int y) => 0 <= x && x < Width && 0 <= y && y < Height;
 
-    public override long Part2()
+    public override string Part2()
     {
         HashSet<(int x, int y)> visited = [];
         foreach (List<(int x, int y)> list in Map.Values)
@@ -78,6 +78,6 @@ public class Day08 : BaseDay
             }
         }
 
-        return visited.Count;
+        return $"{visited.Count}";
     }
 }

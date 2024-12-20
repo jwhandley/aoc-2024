@@ -15,14 +15,14 @@ public class Day18 : BaseDay
     public Day18()
     {
         barriers = [];
-        foreach (var line in Input.Split(Environment.NewLine))
+        foreach (string line in Input.Split(Environment.NewLine))
         {
             int[] coords = line.Split(',').Select(int.Parse).ToArray();
             barriers.Add((coords[0], coords[1]));
         }
     }
 
-    public override long Part1() => BreadthFirstSearch(0, 0, 70, 70, barriers.Take(1024).ToHashSet()) ?? 0;
+    public override string Part1() => BreadthFirstSearch(0, 0, 70, 70, barriers.Take(1024).ToHashSet()).ToString() ?? string.Empty;
 
     private int? BreadthFirstSearch(int x, int y, int tx, int ty, HashSet<(int x, int y)> fallen)
     {
@@ -69,11 +69,10 @@ public class Day18 : BaseDay
         return low;
     }
 
-    public override long Part2()
+    public override string Part2()
     {
         int idx = BinarySearch();
 
-        Console.WriteLine(barriers[idx]);
-        return idx;
+        return barriers[idx].ToString();
     }
 }

@@ -23,7 +23,7 @@ public class Day05 : BaseDay
             .ToList();
     }
 
-    public override long Part1() => updates.Where(IsSorted).Sum(update => update[update.Count / 2]);
+    public override string Part1() => updates.Where(IsSorted).Sum(update => update[update.Count / 2]).ToString();
 
     private bool IsSorted(List<int> update)
     {
@@ -42,9 +42,9 @@ public class Day05 : BaseDay
         return ruleSet.Contains((j, i)) ? 1 : 0;
     }
 
-    public override long Part2() => updates.Where(u => !IsSorted(u)).Sum(u =>
+    public override string Part2() => updates.Where(u => !IsSorted(u)).Sum(u =>
     {
         u.Sort(Compare);
         return u[u.Count / 2];
-    });
+    }).ToString();
 }

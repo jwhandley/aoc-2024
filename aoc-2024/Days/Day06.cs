@@ -26,7 +26,7 @@ public class Day06 : BaseDay
     }
     
     private bool InBounds(int r, int c) => r >= 0 && r < grid.Length && c >= 0 && c < grid[0].Length;
-    public override long Part1() => Path().Count;
+    public override string Part1() => Path().Count.ToString();
 
     private HashSet<(int x, int y)> Path()
     {
@@ -73,6 +73,6 @@ public class Day06 : BaseDay
         }
     }
 
-    public override long Part2() => Path().Where(pos => pos != guardStart).AsParallel().Count(InLoop);
+    public override string Part2() => Path().Where(pos => pos != guardStart).AsParallel().Count(InLoop).ToString();
     
 }

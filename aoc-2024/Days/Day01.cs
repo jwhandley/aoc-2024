@@ -2,7 +2,7 @@ namespace aoc_2024.Days;
 
 public class Day01 : BaseDay
 {
-    public override long Part1()
+    public override string Part1()
     {
         var left = new List<int>();
         var right = new List<int>();
@@ -23,10 +23,10 @@ public class Day01 : BaseDay
             result += Math.Abs(left[i] - right[i]);
         }
         
-        return result;
+        return $"{result}";
     }
 
-    public override long Part2()
+    public override string Part2()
     {
         var list = new List<int>();
         var counts = new Dictionary<int, int>();
@@ -41,6 +41,7 @@ public class Day01 : BaseDay
             counts[right] = counts.GetValueOrDefault(right) + 1;
         }
 
-        return list.Aggregate<int, long>(0, (current, item) => current + item * counts.GetValueOrDefault(item));
+        long result = list.Aggregate<int, long>(0, (current, item) => current + item * counts.GetValueOrDefault(item));
+        return $"{result}";
     }
 }

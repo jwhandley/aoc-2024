@@ -13,6 +13,6 @@ public abstract class BaseDay
         return int.TryParse(typeName[(typeName.IndexOf(ClassPrefix, StringComparison.Ordinal) + ClassPrefix.Length)..], out int i) ? i : default;
     }
 
-    public abstract long Part1();
-    public abstract long Part2();
+    public abstract string Part1();
+    public abstract string Part2();
 }

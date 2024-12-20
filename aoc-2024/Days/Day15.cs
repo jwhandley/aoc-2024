@@ -47,7 +47,7 @@ public class Day15 : BaseDay
         }
     }
 
-    public override long Part1()
+    public override string Part1()
     {
         var robot = new Body(startPos, 1, 1);
         List<Body> boxes = LoadBodies(1, 'O').ToList();
@@ -58,11 +58,11 @@ public class Day15 : BaseDay
             robot.Move(move, boxes);
         }
 
-        return CalculateScore(boxes);
+        return CalculateScore(boxes).ToString();
     }
 
 
-    public override long Part2()
+    public override string Part2()
     {
         var robot = new Body(startPos with { X = startPos.X * 2 }, 1, 1);
         List<Body> boxes = LoadBodies(2, 'O').ToList();
@@ -73,7 +73,7 @@ public class Day15 : BaseDay
             robot.Move(move, boxes);
         }
 
-        return CalculateScore(boxes);
+        return CalculateScore(boxes).ToString();
     }
 
     private static long CalculateScore(IEnumerable<Body> boxes) =>

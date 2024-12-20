@@ -30,7 +30,7 @@ public class Day10 : BaseDay
             }
         }
     }
-    public override long Part1() => TrailHeads.Sum(head => BreadthFirstSearch(head.r, head.c));
+    public override string Part1() => TrailHeads.Sum(head => BreadthFirstSearch(head.r, head.c)).ToString();
 
     private int BreadthFirstSearch(int startRow, int startCol)
     {
@@ -79,5 +79,5 @@ public class Day10 : BaseDay
     }
     
     private bool InBounds(int r, int c) => r >= 0 && r < Height && c >= 0 && c < Width;
-    public override long Part2() => TrailHeads.Sum(head => BreadthFirstSearch2(head.r, head.c));
+    public override string Part2() => TrailHeads.Sum(head => BreadthFirstSearch2(head.r, head.c)).ToString();
 }

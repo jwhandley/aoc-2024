@@ -23,7 +23,7 @@ public class Day04 : BaseDay
         lines = Input.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    public override long Part1()
+    public override string Part1()
     {
         int count = 0;
         for (int r = 0; r < lines.Length; r++)
@@ -36,7 +36,7 @@ public class Day04 : BaseDay
         }
 
 
-        return count;
+        return count.ToString();
     }
 
     private bool IsXmas(int r, int c, (int dr, int dc) dir)
@@ -52,7 +52,7 @@ public class Day04 : BaseDay
         return true;
     }
 
-    public override long Part2()
+    public override string Part2()
     {
         int count = 0;
         for (int r = 1; r < lines.Length - 1; r++)
@@ -72,6 +72,6 @@ public class Day04 : BaseDay
         }
 
 
-        return count;
+        return count.ToString();
     }
 }

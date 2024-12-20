@@ -19,14 +19,14 @@ public class Day17 : BaseDay
         program = programStr[9..].Split(",").Select(int.Parse).ToArray();
     }
     
-    public override long Part1()
+    public override string Part1()
     {
         var computer = new TrinaryComputer(registerA, registerB, registerC, program);
         List<long> result = computer.Execute();
-        return long.Parse(string.Join("", result));
+        return string.Join(",", result);
     }
 
-    public override long Part2()
+    public override string Part2()
     {
         Stack<int> stack = new(program);
         List<long> possibilities = [1,2,3,4,5,6,7];
@@ -43,7 +43,7 @@ public class Day17 : BaseDay
 
                 if (result.First() != target) continue;
                 
-                if (stack.Count == 0) return value;
+                if (stack.Count == 0) return value.ToString();
                 for (int i = 0; i < 8; i++)
                 {
                     next.Add(value * 8 + i);    
@@ -53,9 +53,7 @@ public class Day17 : BaseDay
             possibilities = next;
         }
         
-        Console.WriteLine(string.Join(", ", possibilities));
-        
-        return 0;
+        return "";
     }
 }
 

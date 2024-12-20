@@ -2,9 +2,9 @@ namespace aoc_2024.Days;
 
 public class Day02 : BaseDay
 {
-    public override long Part1() =>
+    public override string Part1() =>
         Input.Split('\n')
-            .Count(line => IsSafe(line.Split(' ').Select(int.Parse).ToArray()));
+            .Count(line => IsSafe(line.Split(' ').Select(int.Parse).ToArray())).ToString();
 
     private static bool IsSafe(int[] report)
     {
@@ -40,6 +40,6 @@ public class Day02 : BaseDay
     }
 
 
-    public override long Part2() =>
-        Input.Split('\n').Count(line => IsSafeWithRemoval(line.Split(' ').Select(int.Parse).ToArray()));
+    public override string Part2() =>
+        Input.Split('\n').Count(line => IsSafeWithRemoval(line.Split(' ').Select(int.Parse).ToArray())).ToString();
 }

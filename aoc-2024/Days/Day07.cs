@@ -15,11 +15,11 @@ public class Day07 : BaseDay
         }).ToArray();
     }
 
-    public override long Part1() => equations.AsParallel()
-        .Where(e => SolveRecursive(e.Target, e.Numbers)).Sum(e => e.Target);
+    public override string Part1() => equations.AsParallel()
+        .Where(e => SolveRecursive(e.Target, e.Numbers)).Sum(e => e.Target).ToString();
 
-    public override long Part2() => equations.AsParallel()
-        .Where(e => SolveRecursive(e.Target, e.Numbers, true)).Sum(e => e.Target);
+    public override string Part2() => equations.AsParallel()
+        .Where(e => SolveRecursive(e.Target, e.Numbers, true)).Sum(e => e.Target).ToString();
 
     private static bool SolveRecursive(long target, long[] numbers, bool useConcat = false, int idx = 0)
     {

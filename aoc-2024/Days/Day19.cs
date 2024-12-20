@@ -14,7 +14,7 @@ public class Day19 : BaseDay
         targets = parts[1].Split("\n").ToList();
     }
 
-    public override long Part1() => targets.Count(CanMake);
+    public override string Part1() => targets.Count(CanMake).ToString();
 
 
     private bool CanMake(string target) =>
@@ -32,5 +32,5 @@ public class Day19 : BaseDay
         return result;
     }
 
-    public override long Part2() => targets.Sum(MakeCount);
+    public override string Part2() => targets.Sum(MakeCount).ToString();
 }

@@ -85,6 +85,6 @@ public class Day20 : BaseDay
         return result;
     }
 
-    public override long Part1() => Solve(2);
-    public override long Part2() => Solve(20);
+    public override string Part1() => Solve(2).ToString();
+    public override string Part2() => Solve(20).ToString();
 }

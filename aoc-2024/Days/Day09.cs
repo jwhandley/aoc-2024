@@ -41,7 +41,7 @@ public class Day09 : BaseDay
         }
     }
 
-    public override long Part1()
+    public override string Part1()
     {
         int head = 0;
         int tail = blocks.Length - 1;
@@ -56,10 +56,10 @@ public class Day09 : BaseDay
             blocks[tail--] = null;
         }
         
-        return blocks.Select((v, i) => v == null ? 0L : (long)v * i).Sum();
+        return blocks.Select((v, i) => v == null ? 0L : (long)v * i).Sum().ToString();
     }
 
-    public override long Part2()
+    public override string Part2()
     {
         for (int i = files.Count - 1; i >= 0; i--)
         {
@@ -87,7 +87,7 @@ public class Day09 : BaseDay
             result += tmp;
         }
         
-        return result;
+        return result.ToString();
     }
 }
 

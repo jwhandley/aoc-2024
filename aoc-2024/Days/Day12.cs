@@ -121,7 +121,7 @@ public class Day12 : BaseDay
     }
 
     
-    public override long Part1() => FloodFill().Sum(r => r.Area() * r.Perimeter());
+    public override string Part1() => FloodFill().Sum(r => r.Area() * r.Perimeter()).ToString();
 
-    public override long Part2() => FloodFill().Sum(r => r.Area() * r.Sides());
+    public override string Part2() => FloodFill().Sum(r => r.Area() * r.Sides()).ToString();
 }

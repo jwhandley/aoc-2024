@@ -75,11 +75,11 @@ public class Day14 : BaseDay
     
     
     
-    public override long Part1()
+    public override string Part1()
     {
         foreach (var robot in robots) robot.Update(100);
         
-        return Score();
+        return Score().ToString();
     }
 
     private long Score()
@@ -99,7 +99,7 @@ public class Day14 : BaseDay
         return nw * ne * sw * se;
     }
 
-    public override long Part2()
+    public override string Part2()
     {
         int seconds = 1;
         long minScore = int.MaxValue;
@@ -125,7 +125,7 @@ public class Day14 : BaseDay
         }
         
         if (DrawTree) Console.WriteLine(tree);
-        return minSeconds;
+        return minSeconds.ToString();
     }
 
     private string Print()

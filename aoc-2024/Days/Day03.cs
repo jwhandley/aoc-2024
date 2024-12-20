@@ -4,18 +4,18 @@ namespace aoc_2024.Days;
 
 public partial class Day03 : BaseDay
 {
-    public override long Part1() => MulRegex()
+    public override string Part1() => MulRegex()
         .Matches(Input)
-        .Sum(match => MulProduct(match.Value));
+        .Sum(match => MulProduct(match.Value)).ToString();
     
-    public override long Part2() => Part2Regex()
+    public override string Part2() => Part2Regex()
         .Matches(Input)
         .Aggregate((active: true, sum: 0L), (state, match) => match.Value switch
         {
             "do()" => (true, state.sum),
             "don't()" => (false, state.sum),
             _ => (state.active, state.active ? state.sum + MulProduct(match.Value) : state.sum)
-        }).sum;
+        }).sum.ToString();
 
     private static int MulProduct(string match)
     {

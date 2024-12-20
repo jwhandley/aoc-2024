@@ -11,7 +11,7 @@ public class Day11 : BaseDay
         startingNumbers = Input.Split(' ').Select(int.Parse).ToArray();
     }
 
-    public override long Part1() => startingNumbers.Sum(n => DepthFirstSearch(n, 25));
+    public override string Part1() => startingNumbers.Sum(n => DepthFirstSearch(n, 25)).ToString();
 
     private static int CountDigits(long number) => number <= 9 ? 1 : (int)Math.Floor(Math.Log10(number)) + 1;
     
@@ -45,5 +45,5 @@ public class Day11 : BaseDay
         return cache[(number, remaining)];
     }
 
-    public override long Part2() => startingNumbers.Sum(n => DepthFirstSearch(n, 75));
+    public override string Part2() => startingNumbers.Sum(n => DepthFirstSearch(n, 75)).ToString();
 }

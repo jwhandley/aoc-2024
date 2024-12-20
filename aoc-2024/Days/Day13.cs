@@ -21,7 +21,7 @@ public partial class Day13 : BaseDay
         }
     }
 
-    public override long Part1()
+    public override string Part1()
     {
         long result = 0;
         foreach (var (prize, buttonA, buttonB) in machines)
@@ -35,7 +35,7 @@ public partial class Day13 : BaseDay
             result += x1/determinant*3 + x2/determinant;
         }
         
-        return result;
+        return $"{result}";
     }
 
     private readonly partial record struct Point(long X, long Y)
@@ -55,7 +55,7 @@ public partial class Day13 : BaseDay
         private static partial Regex NumRegex();
     }
 
-    public override long Part2()
+    public override string Part2()
     {
         long result = 0;
         foreach (var (prize, buttonA, buttonB) in machines)
@@ -70,6 +70,6 @@ public partial class Day13 : BaseDay
             result += x1/determinant*3 + x2/determinant;
         }
         
-        return result;
+        return $"{result}";
     }
 }

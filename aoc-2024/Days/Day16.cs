@@ -182,10 +182,7 @@ public class Day16 : BaseDay
     }
 
 
-    public override long Part1()
-    {
-        return Dijkstra(startPos, targetPos);
-    }
+    public override string Part1() => Dijkstra(startPos, targetPos).ToString(); 
 
-    public override long Part2() => ShortestPaths(startPos, targetPos);
+    public override string Part2() => ShortestPaths(startPos, targetPos).ToString();
 }

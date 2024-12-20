@@ -22,7 +22,7 @@ public class Day18 : BaseDay
         }
     }
 
-    public override long Part1() =>BreadthFirstSearch(0, 0, 70, 70, barriers.Take(1024).ToHashSet()) ?? 0;
+    public override long Part1() => BreadthFirstSearch(0, 0, 70, 70, barriers.Take(1024).ToHashSet()) ?? 0;
 
     private int? BreadthFirstSearch(int x, int y, int tx, int ty, HashSet<(int x, int y)> fallen)
     {
@@ -39,7 +39,7 @@ public class Day18 : BaseDay
 
             foreach ((int dx, int dy) in directions)
             {
-                queue.Enqueue((cx+dx,cy+dy, d+1));
+                queue.Enqueue((cx + dx, cy + dy, d + 1));
             }
         }
 
@@ -54,7 +54,7 @@ public class Day18 : BaseDay
         while (low < high)
         {
             int mid = low + (high - low) / 2;
-            HashSet<(int x, int y)> fallen = barriers.Take(mid+1).ToHashSet();
+            HashSet<(int x, int y)> fallen = barriers.Take(mid + 1).ToHashSet();
 
             if (BreadthFirstSearch(0, 0, 70, 70, fallen) != null)
             {
@@ -65,14 +65,14 @@ public class Day18 : BaseDay
                 high = mid;
             }
         }
-        
+
         return low;
     }
 
     public override long Part2()
     {
         int idx = BinarySearch();
-        
+
         Console.WriteLine(barriers[idx]);
         return idx;
     }

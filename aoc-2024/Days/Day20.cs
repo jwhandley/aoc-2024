@@ -70,11 +70,15 @@ public class Day20 : BaseDay
 
         foreach ((var startCheat, int dist1) in path)
         {
-            foreach ((var endCheat, int dist2) in path)
+            for (int dx = -2; dx <= 2; dx++)
             {
-                if (ManhattanDist(startCheat, endCheat) != 2) continue;
-                int newCost = dist1 + (cost - dist2) + 2;
-                if (cost - newCost >= 100) result++;
+                for (int dy = -2; dy <= 2; dy++)
+                {
+                    if (ManhattanDist(startCheat, startCheat + new Vector2(dx, dy)) != 2) continue;
+                    if (!path.TryGetValue(startCheat + new Vector2(dx, dy), out int dist2)) continue;
+                    int newCost = dist1 + (cost - dist2) + 2;
+                    if (cost - newCost >= 100) result++;
+                }
             }
         }
 

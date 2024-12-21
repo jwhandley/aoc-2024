@@ -11,7 +11,7 @@ public partial class Day21 : BaseDay
 
     public Day21()
     {
-        cache = [];
+        cache = new Dictionary<(char, char, int, bool), long>();
         targets = Input.Split(Environment.NewLine);
         numpad = [];
         numpad['A'] = (0, 2);
@@ -43,7 +43,7 @@ public partial class Day21 : BaseDay
         var startPos = useNumpad ? numpad[start] : directionalKeyPad[start];
         (int r, int c) illegal = useNumpad ? (0, 0) : (1, 0);
 
-        Stack<(int r, int c, string current)> stack = [];
+        Stack<(int r, int c, string current)> stack = new();
         stack.Push((startPos.r, startPos.c, ""));
 
         while (stack.Count > 0)
@@ -74,57 +74,47 @@ public partial class Day21 : BaseDay
         }
     }
 
-    private long MinCostToMake(char start, char target, int depth, bool useNumpad)
-    {
-        if (cache.TryGetValue((start, target, depth, useNumpad), out long cost)) return cost;
-        if (depth == 0) return WaysToMake(start, target, useNumpad).Select(s => s.Length).Min();
-        
-        long minCost = long.MaxValue;
-        foreach (var way in WaysToMake(start, target, useNumpad))
-        {
-            long tmp = 0;
-            char last = 'A';
-            foreach (char c in way)
-            {
-                long best = MinCostToMake(last, c, depth - 1, false);
-                last = c;
-                tmp += best;
-            }
-            
-            minCost = Math.Min(minCost, tmp);
-        }
-        
-        cache[(start, target, depth, useNumpad)] = minCost;
-        return minCost;
-    }
-
-    private long MinCostToMakeString(string target, int depth)
+    private long Solve(string target, int depth)
     {
         long result = 0;
         char last = 'A';
         foreach (char t in target)
         {
-            result += MinCostToMake(last, t, depth, true);
+            result += MinCost(last, t, depth, true);
             last = t;
         }
 
         return result;
+
+        long MinCost(char start, char t, int d, bool useNumpad)
+        {
+            if (cache.TryGetValue((start, t, d, useNumpad), out long cost)) return cost;
+            if (d == 0) return WaysToMake(start, t, useNumpad).Select(s => s.Length).Min();
+
+            long minCost = long.MaxValue;
+            foreach (string way in WaysToMake(start, t, useNumpad))
+            {
+                long tmp = 0;
+                char prev = 'A';
+                foreach (char c in way)
+                {
+                    long best = MinCost(prev, c, d - 1, false);
+                    prev = c;
+                    tmp += best;
+                }
+
+                minCost = Math.Min(minCost, tmp);
+            }
+
+            cache[(start, t, d, useNumpad)] = minCost;
+            return minCost;
+        }
     }
 
-    public override string Part1() => targets.Sum(t =>
-    {
-        long cost = MinCostToMakeString(t, 2);
-        int value = int.Parse(NumRegex().Match(t).Value);
-        return value * cost;
-    }).ToString();
+    public override string Part1() => targets.Sum(t => Solve(t, 2) * long.Parse(NumRegex().Match(t).Value)).ToString();
 
 
-    public override string Part2()  => targets.Sum(t =>
-    {
-        long cost = MinCostToMakeString(t, 25);
-        long value = long.Parse(NumRegex().Match(t).Value);
-        return value * cost;
-    }).ToString();
+    public override string Part2() => targets.Sum(t => Solve(t, 25) * long.Parse(NumRegex().Match(t).Value)).ToString();
 
     [GeneratedRegex(@"\d+")]
     private static partial Regex NumRegex();

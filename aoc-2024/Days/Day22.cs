@@ -3,7 +3,7 @@ namespace aoc_2024.Days;
 public class Day22 : BaseDay
 {
     private readonly int[] seeds;
-    private readonly Dictionary<(int, int, int, int), int> prices;
+    private readonly Dictionary<int, int> prices;
 
     public Day22()
     {
@@ -14,16 +14,17 @@ public class Day22 : BaseDay
 
     private static long Next(long seed)
     {
-        long step1 = seed * 64;
+        long step1 = seed << 6;
         seed ^= step1;
-        seed %= 16777216;
-        long step2 = seed / 32;
+        seed &= 0xFFFFFF;
+        
+        long step2 = seed >> 5;
         seed ^= step2;
-        seed %= 16777216;
+        seed &= 0xFFFFFF;
 
-        long step3 = seed * 2048;
+        long step3 = seed << 11;
         seed ^= step3;
-        seed %= 16777216;
+        seed &= 0xFFFFFF;
 
         return seed;
     }
@@ -48,7 +49,7 @@ public class Day22 : BaseDay
         }
         
         
-        HashSet<(int, int, int, int)> seen = [];
+        HashSet<int> seen = [];
         for (int i = 4; i < numbers.Count; ++i)
         {
             int d1 = numbers[i - 3] - numbers[i - 4];
@@ -56,9 +57,14 @@ public class Day22 : BaseDay
             int d3 = numbers[i - 1] - numbers[i - 2];
             int d4 = numbers[i] - numbers[i - 1];
 
-            if (!seen.Add((d1, d2, d3, d4))) continue;
-            if (!prices.ContainsKey((d1, d2, d3, d4))) prices[(d1, d2, d3, d4)] = 0;
-            prices[(d1, d2, d3, d4)] += numbers[i];
+            int hash = ((d1 + 9) << 15)|((d2 +9) << 10)|((d3 + 9) << 5)|(d4 + 9);
+
+            if (!seen.Add(hash)) continue;
+            if (!prices.TryGetValue(hash, out int value))
+            {
+                prices[hash] = numbers[i];
+            }
+            prices[hash] = value + numbers[i];
         }
     }
 

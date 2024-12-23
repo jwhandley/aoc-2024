@@ -14,13 +14,8 @@ public class Day23 : BaseDay
         }
     }
 
-    public override string Part1() => graph.ThreeConnected().Count(c => c.Any(n => n.StartsWith('t'))).ToString();
-    public override string Part2()
-    {
-        List<string> best = graph.ConnectedComponents().MaxBy(c => c.Count)!.ToList();
-        best.Sort();
-        return string.Join(",", best);
-    }
+    public override string Part1() => $"{graph.ThreeConnected().Count(c => c.Any(n => n.StartsWith('t'))) / 6}";
+    public override string Part2() => string.Join(",", graph.ConnectedComponents().MaxBy(c => c.Count) ?? []);
 }
 
 public class Graph
@@ -45,65 +40,26 @@ public class Graph
         node2Neighbors.Add(node1);
         AdjacencyList[node2] = node2Neighbors;
     }
+
     private bool HasEdge(string node1, string node2) => AdjacencyList[node1].Contains(node2);
 
-    public List<HashSet<string>> ConnectedComponents()
+    public IEnumerable<List<string>> ConnectedComponents() => AdjacencyList.Keys.Select(n =>
     {
-        HashSet<HashSet<string>> components = new(new HashSetValueComparer());
-
-        foreach (string n in AdjacencyList.Keys)
+        var component = new HashSet<string> { n };
+        foreach (string n1 in AdjacencyList[n].Where(n1 => component.All(n2 => n1 != n2 && HasEdge(n1, n2))))
         {
-            HashSet<string> component = [n];
-            foreach (string n1 in AdjacencyList[n])
-            {
-                if (!component.All(n2 => n1 != n2 && HasEdge(n1, n2))) continue;
-                component.Add(n1);
-            }
-            components.Add(component);
+            component.Add(n1);
         }
+        
+        List<string> result = component.ToList();
+        result.Sort();
+        return result;
+    });
 
-        return components.ToList();
-    }
-
-    public List<HashSet<string>> ThreeConnected()
-    {
-        HashSet<HashSet<string>> visited = new(new HashSetValueComparer());
-        List<HashSet<string>> components = [];
-
-        foreach (string n in AdjacencyList.Keys)
-        {
-            foreach (string n1 in AdjacencyList[n])
-            {
-                foreach (string n2 in AdjacencyList[n1])
-                {
-                    if (n1 == n2) continue;
-                    if (!HasEdge(n, n2)) continue;
-                    if (!visited.Add([n, n1, n2])) continue;
-                    components.Add([n, n1, n2]);
-                }
-            }
-        }
-
-        return components;
-    }
-}
-
-public class HashSetValueComparer : IEqualityComparer<HashSet<string>>
-{
-    public bool Equals(HashSet<string>? x, HashSet<string>? y)
-    {
-        // If both are null, or both are the same reference, they are equal
-        if (ReferenceEquals(x, y)) return true;
-
-        // If one is null but not the other, they are not equal
-        if (x == null || y == null) return false;
-
-        // Compare contents using SetEquals
-        return x.SetEquals(y);
-    }
-
-    public int GetHashCode(HashSet<string>? obj)
-    {
-        return obj == null ? 0 : obj.Aggregate(0, (hash, item) => hash ^ item.GetHashCode());
-    }
+    public IEnumerable<List<string>> ThreeConnected() => 
+        from n in AdjacencyList.Keys
+        from n1 in AdjacencyList[n]
+        from n2 in AdjacencyList[n1]
+        where HasEdge(n, n2)
+        select new List<string> { n, n1, n2 };
 }

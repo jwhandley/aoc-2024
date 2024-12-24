@@ -1,9 +1,8 @@
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace aoc_2024.Days;
 
-public class Day24 : BaseDay
+public partial class Day24 : BaseDay
 {
     private readonly Adder adder = new Adder();
 
@@ -13,8 +12,7 @@ public class Day24 : BaseDay
         string[] parts = Input.Split("\n\n");
 
         Dictionary<string, IElectric> wires = [];
-
-
+        
         foreach (string line in parts[0].Split('\n'))
         {
             string[] tokens = line.Split(": ");
@@ -34,11 +32,11 @@ public class Day24 : BaseDay
 
             wires.Add(name, input);
         }
-        
-        
+
+
         foreach (string line in parts[1].Split('\n'))
         {
-            string operation = Regex.Match(line, "OR|XOR|AND").Value;
+            string operation = LogicGateRegex().Match(line).Value;
             string[] tokens = line.Split(" ");
             string a = tokens[0];
             string b = tokens[2];
@@ -72,12 +70,14 @@ public class Day24 : BaseDay
     public override string Part1() => adder.Execute().Item1.ToString();
 
     public override string Part2() => adder.Execute().Item2;
+    [GeneratedRegex("OR|XOR|AND")]
+    private static partial Regex LogicGateRegex();
 }
 
 public class Switch(string name, bool value) : IElectric
 {
     public string Name { get; } = name;
-    public bool On { get; set; } = value;
+    public bool On { get; } = value;
     public override int GetHashCode() => Name.GetHashCode();
 
     public override string ToString()
@@ -119,14 +119,15 @@ public class Gate(IElectric input1, IElectric input2, Operation operation, Wire 
     public IElectric Input2 { get; } = input2;
     public Operation Op { get; } = operation;
     public Wire Output { get; set; } = target;
-    
+
     public override string ToString() => $"{Input1} {Op} {Input2} => {Output}";
-    
-    public bool XorY => (Input1.Name.StartsWith('x') || Input1.Name.StartsWith('y')) && (Input2.Name.StartsWith('x') || Input2.Name.StartsWith('y'));
+
+    public bool XorY => (Input1.Name.StartsWith('x') || Input1.Name.StartsWith('y')) &&
+                        (Input2.Name.StartsWith('x') || Input2.Name.StartsWith('y'));
+
     public bool IsXor => Op == Operation.Xor;
     public bool HasZOutput => Output.Name.StartsWith('z');
-    
-    public bool IsStart => Input1.Name is ("x00" or "y00") && Input2.Name is ("x00" or "y00");
+    public bool IsStart => Input1.Name is "x00" or "y00" && Input2.Name is "x00" or "y00";
 }
 
 public class Adder
@@ -140,52 +141,6 @@ public class Adder
     public void AddX(Switch input) => X.Add(input);
     public void AddY(Switch input) => Y.Add(input);
     public void AddOutput(Wire output) => Z.Add(output);
-
-    public void SetX(int value)
-    {
-        foreach (var s in X) s.On = false;
-
-        foreach (var t in X)
-        {
-            t.On = value % 2 == 1;
-            value >>= 1;
-            if (value == 0) break;
-        }
-    }
-
-    public long GetXValue()
-    {
-        long result = 0;
-        for (int i = 0; i < X.Count; i++)
-        {
-            if (X[i].On) result |= (1L << i);
-        }
-
-        return result;
-    }
-
-    public long GetYValue()
-    {
-        long result = 0;
-        for (int i = 0; i < Y.Count; i++)
-        {
-            if (Y[i].On) result |= (1L << i);
-        }
-
-        return result;
-    }
-
-    public void SetY(int value)
-    {
-        foreach (var s in Y) s.On = false;
-
-        foreach (var t in Y)
-        {
-            t.On = value % 2 == 1;
-            value >>= 1;
-            if (value == 0) break;
-        }
-    }
 
     private IEnumerable<Gate> Neighbors(IElectric input)
     {
@@ -214,12 +169,16 @@ public class Adder
                     Operation.Xor => gate.Input1.On ^ gate.Input2.On,
                     _ => throw new ArgumentOutOfRangeException()
                 };
-                
-                if (gate is {IsXor: false, HasZOutput: true} && gate.Output.Name != "z45") suspects.Add(gate.Output.Name);
-                if (gate is {IsXor: true, XorY: false} && !gate.Output.Name.StartsWith('z')) suspects.Add(gate.Output.Name);
-                if (gate is {IsXor: true} && !Neighbors(gate.Output).All(n => n.Op is Operation.Xor or Operation.And)) suspects.Add(gate.Output.Name);
-                if (gate is { Op: Operation.And, IsStart: false } && Neighbors(gate.Output).All(n => n.Op != Operation.Or)) suspects.Add(gate.Output.Name);
-                
+
+                if (gate is { IsXor: false, HasZOutput: true } && gate.Output.Name != "z45")
+                    suspects.Add(gate.Output.Name);
+                if (gate is { IsXor: true, XorY: false } && !gate.Output.Name.StartsWith('z'))
+                    suspects.Add(gate.Output.Name);
+                if (gate is { IsXor: true } && !Neighbors(gate.Output).All(n => n.Op is Operation.Xor or Operation.And))
+                    suspects.Add(gate.Output.Name);
+                if (gate is { Op: Operation.And, IsStart: false } &&
+                    Neighbors(gate.Output).All(n => n.Op != Operation.Or)) suspects.Add(gate.Output.Name);
+
                 computed.Add(gate.Output);
             }
             else
@@ -228,16 +187,13 @@ public class Adder
             }
         }
 
-        List<string> suspectList = suspects.ToList();
-        suspectList.Sort();
-        
-        var sb = new StringBuilder();
+
+        long result = 0;
         foreach (var w in Z.OrderByDescending(w => w.Name))
         {
-            sb.Append(w.On ? '1' : '0');
+            result = (result << 1) | (w.On ? 1L : 0L);
         }
-
-        string result = sb.ToString();
-        return (Convert.ToInt64(result, 2), string.Join(",", suspectList));
+        
+        return (result, string.Join(",", suspects.Order()));
     }
 }
